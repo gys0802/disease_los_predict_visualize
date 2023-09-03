@@ -28,30 +28,17 @@ def patient():
     patient = pd.read_csv("./data/patients.csv.gz", compression='gzip', error_bad_lines=False)
     return patient
 
-@st.cache_data
 def disease():
     disease = pd.read_csv("./data/disease.csv.gz", compression='gzip', error_bad_lines=False)
     return disease
 
-@st.cache_data
-def disease_model():
-    model = pkl.load(open('./data/disease_model.sav', 'rb'))
-    return model
-
-@st.cache_data
-def los_model():
-    model = pkl.load(open('./data/los_model.sav', 'rb'))
-    return model
-    
 a = data()
 b = admin()
 c = patient()
 d = disease()
-e = disease_model()
-f = los_model()
 
-def prediction_los(input_data,f):
-    load_model = f
+def prediction_los(input_data):
+    load_model = pkl.load(open('./data/los_model.sav', 'rb'))
 
     input_data_as_numpy_array = np.asarray(input_data)
     # Convert the tuple to a 2D numpy array
@@ -63,7 +50,7 @@ def prediction_los(input_data,f):
     st.header("Predicted LOS:")
     st.write(predictions, 'days')
 
-def los_prediction(f):
+def los_prediction():
     html_temp = """ 
         <div style ="padding:13px;padding-bottom:50px"> 
         <h1 style ="color:white;text-align:center;">Length of Stay Prediction</h1> 
@@ -153,7 +140,7 @@ def los_prediction(f):
         
 
         numeric_input_data = [float(value) if value and value != "0" else 0 for value in input_data]
-        prediction_los(numeric_input_data,f)
+        prediction_los(numeric_input_data)
 
 def los_visualization_menu(a,b,c):
         html_temp = """ 
@@ -270,7 +257,7 @@ def los_filter(a):
         fig1.update_layout(width=800, height=600)
         st.plotly_chart(fig1, use_container_width=True)
 
-def disease_prediction(e):
+def disease_prediction():
     html_temp = """ 
         <div style ="padding:13px;padding-bottom:50px"> 
         <h1 style ="color:white;text-align:center;">Disease Prediction</h1> 
@@ -360,10 +347,10 @@ def disease_prediction(e):
     
 
     numeric_input_data = [float(value) if value and value != "0" else 0 for value in input_data]
-    prediction_disease(numeric_input_data,e)
+    prediction_disease(numeric_input_data)
 
-def prediction_disease(input_data, e):
-    load_model = e
+def prediction_disease(input_data):
+    load_model = pkl.load(open('./data/disease_model.sav', 'rb'))
 
     column_names = ["blood", "circulatory", "congenital", "digestive", "endocrine", "genitourinary", "infectious", "injury", "mental", "misc", "muscular", "neoplasms", "nervous", "pregnancy", "prenatal", "respiratory", "skin"]
 
@@ -442,9 +429,9 @@ def disease_visual(d):
 page = st.sidebar.selectbox('SELECT PAGE',['LOS-Predictions','LOS-Visualization', 'Disease-Predictions', 'Disease-Visualization']) 
 st.sidebar.write("---")
 if page == 'LOS-Predictions':
-    los_prediction(f)
+    los_prediction()
 elif page == 'Disease-Predictions':
-    disease_prediction(e)
+    disease_prediction()
 elif page == 'LOS-Visualization':
     los_visualization_menu(a,b,c)
 else:
